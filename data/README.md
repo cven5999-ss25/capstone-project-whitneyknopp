@@ -17,7 +17,7 @@
 
 3.  Date of data collection (single date, range, approximate date):
     
-    Data was collected for humanitarian crises and emergencies from 09/30/2013 to 12/31/2024.
+    Data was collected for WASH services during emergencies from 09/30/2013 to 12/31/2024.
 
 4.  Geographic location of data collection:
     
