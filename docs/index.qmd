@@ -43,7 +43,60 @@ unhcrwash_raw <- read_csv(here::here("data/raw/unhcrwash.csv"))
 
 ## Data Exploration Approach
 
+```{r data_exploration}
+
+# investigate the data imported data
+head(unhcrWASH_raw)
+dim(unhcrWASH_raw)
+# there are 27 variables as columns and 6425 observations
+# some of these variables are not very relevant: form_id, location_id, reporting_period_monthly_indicator, # reporting_period_annual_indicator
+
+# summarizing some of the data
+unhcrwash_raw |> 
+  group_by(country) |> 
+  summarize(number_of_emergencies = n(),
+            number_of_refugee_camps = n_distinct(location_name),
+            total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
+            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+  knitr::kable(digits = 1)
+
+# summary of all data  
+unhcrWASH_raw |> 
+  group_by(country) |> 
+  summarize(number_of_emergencies = n(),
+            number_of_refugee_camps = n_distinct(location_name),
+            total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
+            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+  knitr::kable(digits = 1)
+
+
+# create emergency end column for year, month and date
+# convert end_year into a factor
+tidy <- unhcrWASH_raw |> 
+  separate(col = end_date, into = c("end_year", "end_month", "end_day"), sep = "-") |> 
+  mutate(end_year = as.numeric(end_year)) 
+  
+# summary of past emergencies in East Africa in the past 10 years (2015 to 2025)
+eastAfrica <- c("Kenya", "Uganda", "Rwanda", "Tanzania", "Ethiopia", "Eritra", "Dijbouti", "Somalia")
+
+tidy |> 
+  filter(country %in% eastAfrica, post_emergency == "Post-emergency") |> 
+  filter(end_year < 2025 & end_year > 2015) |> 
+  group_by(country) |> 
+  summarize(number_of_emergencies = n(),
+            number_of_refugee_camps = n_distinct(location_name),
+            total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
+            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+  knitr::kable(digits = 1)
+
+            
+```
+
 ## Initial Data Tidying
+
+it will be helpful to do an analysis of the duration of emergency as well as compare access during/post emergency
+i also want to do analysis on specific countries with lots of emergencies or refugee camps
+I will also compare when these emergencies happened to see if there has been any improvement (scatter plot time series of percent water, sanitation and hygiene access across countries or camps or during/post)
 
 # Results
 
