@@ -29,6 +29,18 @@ library(tidyverse)
 
 ## Reading the Data
 
+```{r reading_data}
+
+# there are 2 wasy to read in this data because it is also a packange in R
+
+# read data with R package
+unhcrWASH_raw <- unhcrwash
+
+# read csv from the /data path
+unhcrwash_raw <- read_csv(here::here("data/raw/unhcrwash.csv"))
+
+```
+
 ## Data Exploration Approach
 
 ## Initial Data Tidying
