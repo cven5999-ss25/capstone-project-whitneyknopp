@@ -1,0 +1,44 @@
+---
+title: "Emergency WASH Access for Refugees"
+author:
+  - name: "Whitney N Knopp"
+    orcid: "0009-0008-3245-2059"
+    email: "whkn2760@colorado.edu"
+    affiliation:
+      - name: "University of Colorado Boulder"
+        department: "Department of Civil, Environmental and Architectural Engineering"
+        city: "Boulder"
+        state: "CO"
+        country: "USA"
+date: today
+format: html
+editor: visual
+---
+
+
+# Introduction
+
+[Brief description of your project and dataset]
+
+# Methods
+
+```{r load_packages}
+library(unhcrwash)
+library(tidyverse)
+```
+
+## Reading the Data
+
+## Data Exploration Approach
+
+## Initial Data Tidying
+
+# Results
+
+[This will be the core of your analysis with specific requirements]
+
+# Conclusions
+
+## Summary of Findings
+
+## Questions and Next Steps
