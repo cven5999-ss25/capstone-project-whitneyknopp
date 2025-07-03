@@ -15,10 +15,9 @@ format: html
 editor: visual
 ---
 
-
 # Introduction
 
-[Brief description of your project and dataset]
+\[Brief description of your project and dataset\]
 
 # Methods
 
@@ -49,10 +48,11 @@ unhcrwash_raw <- read_csv(here::here("data/raw/unhcrwash.csv"))
 head(unhcrWASH_raw)
 dim(unhcrWASH_raw)
 # there are 27 variables as columns and 6425 observations
-# some of these variables are not very relevant: form_id, location_id, reporting_period_monthly_indicator, # reporting_period_annual_indicator
+# some of these variables are not very relevant: form_id, location_id, reporting_period_monthly_indicator, reporting_period_annual_indicator
 
 # summarizing some of the data
 unhcrwash_raw |> 
+  filter(!is.na(country)) |> 
   group_by(country) |> 
   summarize(number_of_emergencies = n(),
             number_of_refugee_camps = n_distinct(location_name),
@@ -62,6 +62,7 @@ unhcrwash_raw |>
 
 # summary of all data  
 unhcrWASH_raw |> 
+  filter(!is.na(country)) |> 
   group_by(country) |> 
   summarize(number_of_emergencies = n(),
             number_of_refugee_camps = n_distinct(location_name),
@@ -69,17 +70,14 @@ unhcrWASH_raw |>
             avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
   knitr::kable(digits = 1)
 
-
-# create emergency end column for year, month and date
-# convert end_year into a factor
-tidy <- unhcrWASH_raw |> 
-  separate(col = end_date, into = c("end_year", "end_month", "end_day"), sep = "-") |> 
-  mutate(end_year = as.numeric(end_year)) 
-  
 # summary of past emergencies in East Africa in the past 10 years (2015 to 2025)
 eastAfrica <- c("Kenya", "Uganda", "Rwanda", "Tanzania", "Ethiopia", "Eritra", "Dijbouti", "Somalia")
 
-tidy |> 
+# create emergency end column for year, month and date
+# convert end_year into a factor
+unhcrWASH_raw |> 
+  separate(col = end_date, into = c("end_year", "end_month", "end_day"), sep = "-") |> 
+  mutate(end_year = as.numeric(end_year)) |> 
   filter(country %in% eastAfrica, post_emergency == "Post-emergency") |> 
   filter(end_year < 2025 & end_year > 2015) |> 
   group_by(country) |> 
@@ -94,13 +92,52 @@ tidy |>
 
 ## Initial Data Tidying
 
-it will be helpful to do an analysis of the duration of emergency as well as compare access during/post emergency
-i also want to do analysis on specific countries with lots of emergencies or refugee camps
-I will also compare when these emergencies happened to see if there has been any improvement (scatter plot time series of percent water, sanitation and hygiene access across countries or camps or during/post)
+Some of the issues I encountered with the raw data, which I would like to fix with tidying include:
+
+-   Remove any entries without country information
+
+-   Adding an `end_year` column for analysis (this will be a factor)
+
+-   Removing some columns that are not relevant: form_id, location_id, reporting_period_monthly_indicator, reporting_period_annual_indicator, month/day columns that come from creating an end_year column
+
+-   Change the `country` variable type from a character to a factor
+
+-   Add a column with the duration of the emergency
+
+-   Some entries have a refugee population of 0 (which does not seem likely, I will change these to `NA`)
+
+Some of this data tidying depends on the method to bring in the data. If the data is imported as an R package, the dates already exist as a date variable, but importing as a csv, they must be changed. Additionally, the dates are separated with a `-` in the data imported as an R package and with a `/` in the csv file. Because of these differences, I will use the data frame imported from the R package for simplicity.
+
+```{r data_tidying}
+
+# tidy data based on goals listed above
+unhcrWASH_tidy <- unhcrWASH_raw |> 
+  filter(!is.na(country)) |> 
+  mutate(duration_emergency = as.numeric(end_date - start_date)) |> 
+  separate(col = end_date, into = c("end_year", "month", "date"), sep = "-") |> 
+  mutate(end_year = as.integer(end_year)) |> 
+  select(-c("form_id", "location_id", "reporting_monthly", "reporting_annual", "month","date")) |> 
+  relocate(duration_emergency, .after = end_year) |> 
+  mutate(country = as.factor(country)) |> 
+  mutate(refugee_pop = na_if(refugee_pop, 0))
+
+
+# save as tidy data
+write_csv(unhcrWASH_tidy, here::here("data/processed/unhcrwash_tidy.csv"))
+
+```
 
 # Results
 
-[This will be the core of your analysis with specific requirements]
+\[This will be the core of your analysis with specific requirements\]
+
+I want to do analysis that identifies the instances where number of people per water source/latrine/etc. are within the Sphere Minimum Standards for emergencies.
+
+I also want to do some analysis that aligns with the categories for percent access; distinguished with categories of \<25, \[25-50), \[50-75), \[75, 99), \>= 99 source: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-using-safely-managed-drinking-water-services-(-)
+
+It will be interesting to do an analysis of the duration of emergency as well as compare access during/post emergency and analysis on specific countries with lots of emergencies or refugee camps, possibly east Africa (this is the regin in which I work and am most interested)
+
+I will also compare when these emergencies happened to see if there has been any improvement (scatter plot time series of percent water, sanitation and hygiene access across countries or camps or during/post)
 
 # Conclusions
 
