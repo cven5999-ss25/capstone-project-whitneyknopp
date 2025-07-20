@@ -10,6 +10,8 @@ author:
         city: "Boulder"
         state: "CO"
         country: "USA"
+warnings: false
+toc: true
 date: today
 format: html
 editor: visual
@@ -24,6 +26,7 @@ editor: visual
 ```{r load_packages}
 library(unhcrwash)
 library(tidyverse)
+library(gt)
 ```
 
 ## Reading the Data
@@ -121,9 +124,13 @@ unhcrWASH_tidy <- unhcrWASH_raw |>
   mutate(country = as.factor(country)) |> 
   mutate(refugee_pop = na_if(refugee_pop, 0))
 
-
 # save as tidy data
 write_csv(unhcrWASH_tidy, here::here("data/processed/unhcrwash_tidy.csv"))
+
+# some of my analysis will specifically focus on the region of east Africa, I will subset data 
+unhcrWASH_eastAfrica_tidy <- unhcrWASH_tidy |> 
+  filter(country %in% eastAfrica)
+  
 
 ```
 
@@ -131,13 +138,96 @@ write_csv(unhcrWASH_tidy, here::here("data/processed/unhcrwash_tidy.csv"))
 
 \[This will be the core of your analysis with specific requirements\]
 
-I want to do analysis that identifies the instances where number of people per water source/latrine/etc. are within the Sphere Minimum Standards for emergencies.
+```{r}
+#| label: fig-water-quantity-results
+#| fig-cap: Water quantity for displaced people 
 
-I also want to do some analysis that aligns with the categories for percent access; distinguished with categories of \<25, \[25-50), \[50-75), \[75, 99), \>= 99 source: https://www.who.int/data/gho/data/indicators/indicator-details/GHO/population-using-safely-managed-drinking-water-services-(-)
+# this first portion of the analysis will focus on minimum water access for each emergency in East Africa in the last 10 years
+# I am interested in investigating if access to water has improved over time and if there are countries that typically meet needs more or less
+# I also want to see if in general, taps or handpumps provide a more appropriate amount of water
 
-It will be interesting to do an analysis of the duration of emergency as well as compare access during/post emergency and analysis on specific countries with lots of emergencies or refugee camps, possibly east Africa (this is the regin in which I work and am most interested)
+# remove outliers with IQR method
+qnt <- quantile(unhcrWASH_tidy$liters_per_person_per_day, probs=c(.25, .75), na.rm = T)
+iqr <- IQR(unhcrWASH_tidy$liters_per_person_per_day, na.rm = T)
+lower <- qnt[1] - 1.5*iqr
+upper <- qnt[2] + 1.5*iqr
 
-I will also compare when these emergencies happened to see if there has been any improvement (scatter plot time series of percent water, sanitation and hygiene access across countries or camps or during/post)
+#results = subset(results, results$Ecoli < upper & results$Ecoli > lower)
+
+unhcrWASH_tidy_WQuant <- unhcrWASH_eastAfrica_tidy |> 
+  subset(post_emergency == "Emergency" & 
+           start_date > "2015-01-01" & 
+           liters_per_person_per_day < upper & 
+           liters_per_person_per_day > lower) |> 
+  group_by(country) 
+
+unhcrWASH_tidy_WQuant|> 
+  ggplot() +
+  geom_point(data = unhcrWASH_tidy_WQuant,
+             mapping = aes(x = start_date,
+                       y = liters_per_person_per_day,
+                       color = country)) +
+  scale_color_brewer(palette = "Accent", name = "Country") +
+  theme_minimal() + 
+  labs(title = "Emergency drinking water access for refugees in east Africa",
+       subtitle + "In accordance with the Sphere minimum standard of 15 L/person/day",
+       x = "End date of survey",
+       y = "Liters per person per day") + 
+  geom_hline(yintercept = 15, color = "purple")
+
+  
+```
+
+```{r}
+#| label: tab-water-quant
+#| tab-cap: Portion of emergencies in east Africa with adequate water supply
+
+
+# don't like this chart, its not right
+
+unhcrWASH_tidy_WQuant |> 
+  filter(!is.na(liters_per_person_per_day)) |> 
+  mutate(water_quantity_adequate = when(liters_per_person_per_day > 15 ~ 1,
+                                        liters_per_person_per_day < 15 ~ 0)) |> 
+  group_by(country) |> 
+  summarize(average_daily_per_capita_liters_water = mean(liters_per_person_per_day),
+            number_emergencies_adequate_water_quantity = n()) |> 
+  knitr::kable(digits = 2)
+
+
+```
+
+```{r}
+#| label: fig-water-quality
+#| fig-cap: Emergencies 
+
+# i want to look at the subset of countries that have provided sufficient water and adequate water quality
+ # remove lower-bound outliers; upper-bound is 100
+qnt <- quantile(unhcrWASH_tidy$chlorinated_safe_water_quality, probs=c(.25, .75), na.rm = T)
+iqr <- IQR(unhcrWASH_tidy$chlorinated_safe_water_quality, na.rm = T)
+lower <- qnt[1] - 1.5*iqr
+
+unhcrWASH_eastAfrica_tidy |> 
+    subset(post_emergency == "Post-emergency" & 
+           start_date > "2015-01-01" &
+           chlorinated_safe_water_quality < 100 & 
+           chlorinated_safe_water_quality > lower) |> 
+  ggplot(mapping = aes(x = country,
+                       y = chlorinated_safe_water_quality,
+                       color = country)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(alpha = 2/4) +
+  labs(title = "Water quality at collection points in east African countries post-emergency",
+       subtitle = "Tests meeting Sphere Standards for free Cl range of 0.2 to 2.0 mg/L and turbidity less than 5 NTU",
+       x = "Country",
+       y = "Percent of testing meeting standards") +
+  theme_minimal() +
+  theme(legend.position = "none")
+  
+
+```
+
+
 
 # Conclusions
 
