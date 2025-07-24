@@ -19,21 +19,26 @@ editor: visual
 
 # Introduction
 
-\[Brief description of your project and dataset\]
+Humanitarian and natural emergencies often significantly reduce access to water, sanitation and hygiene (WASH) services for refugee populations and internally displaced peoples. This negatively impacts public health and personal dignity.
+
+My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation. 
 
 # Methods
+
+The data set used in this analysis comes from the United Nations High Commission on Refugees (UNHCR). It documents access to WASH services in refugee camps through numerous indicators collected over 12 years. The UNHCR WASH data are available as a package in R with documentation in github (SITE). 
 
 ```{r load_packages}
 library(unhcrwash)
 library(tidyverse)
 library(gt)
+library(unhcrwash)
 ```
 
 ## Reading the Data
 
 ```{r reading_data}
 
-# there are 2 wasy to read in this data because it is also a packange in R
+# there are 2 ways to read in this data because it is also a package in R
 
 # read data with R package
 unhcrWASH_raw <- unhcrwash
@@ -57,20 +62,20 @@ dim(unhcrWASH_raw)
 unhcrwash_raw |> 
   filter(!is.na(country)) |> 
   group_by(country) |> 
-  summarize(number_of_emergencies = n(),
-            number_of_refugee_camps = n_distinct(location_name),
+  summarize(no_emergencies = n(),
+            no_refugee_camps = n_distinct(location_name),
             total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
-            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+            avg_L_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
   knitr::kable(digits = 1)
 
 # summary of all data  
 unhcrWASH_raw |> 
   filter(!is.na(country)) |> 
   group_by(country) |> 
-  summarize(number_of_emergencies = n(),
-            number_of_refugee_camps = n_distinct(location_name),
+  summarize(no_emergencies = n(),
+            no_refugee_camps = n_distinct(location_name),
             total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
-            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+            avg_L_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
   knitr::kable(digits = 1)
 
 # summary of past emergencies in East Africa in the past 10 years (2015 to 2025)
@@ -84,10 +89,10 @@ unhcrWASH_raw |>
   filter(country %in% eastAfrica, post_emergency == "Post-emergency") |> 
   filter(end_year < 2025 & end_year > 2015) |> 
   group_by(country) |> 
-  summarize(number_of_emergencies = n(),
-            number_of_refugee_camps = n_distinct(location_name),
+  summarize(no_emergencies = n(),
+            no_refugee_camps = n_distinct(location_name),
             total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
-            avg_liters_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
+            avg_L_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
   knitr::kable(digits = 1)
 
             
@@ -130,17 +135,23 @@ write_csv(unhcrWASH_tidy, here::here("data/processed/unhcrwash_tidy.csv"))
 # some of my analysis will specifically focus on the region of east Africa, I will subset data 
 unhcrWASH_eastAfrica_tidy <- unhcrWASH_tidy |> 
   filter(country %in% eastAfrica)
-  
 
 ```
 
 # Results
 
-\[This will be the core of your analysis with specific requirements\]
+To assess WASH services in east Africa, analysis was conducted for water, sanitation and synthesized for overall results. Adequacy of services were measured in accordance with standards established in the Sphere Handbook chapter on water supply, sanitation and hygiene promotion. The Sphere Handbook include guiding standards for emergency humanitarian response (SOURCE).
 
+
+## Water
+
+Safe water consists of water that is available in adequate quantities, accessible on premise and free from microbial and priority chemical contaminants (site source). Water supply standard 2.1 focuses on access and availability, with a key indicator being a minimum of 15 L/person/day for drinking and domestic needs (site source). @fig-water-quantity-results aims to understand if water access during emergencies in east Africa has improved over the past 10 years (2015 - 2025) as well as countries where water access/availability needs are perpetually met/not achieved. The data does not highlight a trends of increasing access over years of emergencies. However, it is noted that between 2015 and 2025, refugee camps during emergencies in Uganda most often did not provide adequate quantities of drinking water. Conversely, refugee camps in Rwanda consistently were able to deliver adequate quantities of water for drinking and domestic uses. 
+
+### Water Quantity 
 ```{r}
 #| label: fig-water-quantity-results
 #| fig-cap: Water quantity for displaced people 
+#| alt-text: Scatter plot of liters per person per day for 3 countries with during emergencies (Ethiopia, Rwanda and Uganda)
 
 # this first portion of the analysis will focus on minimum water access for each emergency in East Africa in the last 10 years
 # I am interested in investigating if access to water has improved over time and if there are countries that typically meet needs more or less
@@ -170,38 +181,23 @@ unhcrWASH_tidy_WQuant|>
   scale_color_brewer(palette = "Accent", name = "Country") +
   theme_minimal() + 
   labs(title = "Emergency drinking water access for refugees in east Africa",
-       subtitle + "In accordance with the Sphere minimum standard of 15 L/person/day",
+       subtitle = "In accordance with the Sphere minimum standard of 15 L/person/day",
        x = "End date of survey",
        y = "Liters per person per day") + 
   geom_hline(yintercept = 15, color = "purple")
 
-  
 ```
 
-```{r}
-#| label: tab-water-quant
-#| tab-cap: Portion of emergencies in east Africa with adequate water supply
 
+### Water Quality
 
-# don't like this chart, its not right
-
-unhcrWASH_tidy_WQuant |> 
-  filter(!is.na(liters_per_person_per_day)) |> 
-  mutate(water_quantity_adequate = when(liters_per_person_per_day > 15 ~ 1,
-                                        liters_per_person_per_day < 15 ~ 0)) |> 
-  group_by(country) |> 
-  summarize(average_daily_per_capita_liters_water = mean(liters_per_person_per_day),
-            number_emergencies_adequate_water_quantity = n()) |> 
-  knitr::kable(digits = 2)
-
-
-```
+The other key component of safe water access is water quality. The Sphere Handbook, standard 2.1, requires tests where drinking water has turbidity below 5 NTU and a residual free chlorine level between 0.2 and 2 mg/L (SITE). @fig-water-quality is a box plot of the percentage of water quality tests after an emergency that comply with Sphere standards. @tab-water-qual presented the summary statistics for each country. On average, more than 90% of water quality tests for all east African countries complied with Sphere standards. 
 
 ```{r}
 #| label: fig-water-quality
-#| fig-cap: Emergencies 
+#| fig-cap: Percentage of water quality tests in refugee camps complying with Sphere Minimum Standards for east African countries post-emergency
+#| alt-text: Box plot for east African water quality tests
 
-# i want to look at the subset of countries that have provided sufficient water and adequate water quality
  # remove lower-bound outliers; upper-bound is 100
 qnt <- quantile(unhcrWASH_tidy$chlorinated_safe_water_quality, probs=c(.25, .75), na.rm = T)
 iqr <- IQR(unhcrWASH_tidy$chlorinated_safe_water_quality, na.rm = T)
@@ -217,20 +213,162 @@ unhcrWASH_eastAfrica_tidy |>
                        color = country)) +
   geom_boxplot(outlier.shape = NA) +
   geom_jitter(alpha = 2/4) +
-  labs(title = "Water quality at collection points in east African countries post-emergency",
-       subtitle = "Tests meeting Sphere Standards for free Cl range of 0.2 to 2.0 mg/L and turbidity less than 5 NTU",
+  labs(title = "Water quality at refugee camp collection points in east African countries post-emergency",
+       subtitle = "Tests meeting Sphere Standards",
        x = "Country",
        y = "Percent of testing meeting standards") +
   theme_minimal() +
   theme(legend.position = "none")
   
+```
+
+```{r}
+#| label: tab-water-qual
+#| tab-cap: Statistics for water quality tests meeting Sphere Standards for east African countries
+#| alt-text: A table displaying the minimum, maximum, median, mean, standard deviation, 25th and 75th percentiles for water quality tests for each country
+
+unhcrWASH_eastAfrica_tidy |> 
+    subset(post_emergency == "Post-emergency" & 
+           start_date > "2015-01-01" &
+           chlorinated_safe_water_quality < 100 & 
+           chlorinated_safe_water_quality > lower) |> 
+  group_by(country) |> 
+  summarize(min = min(chlorinated_safe_water_quality),
+            max = max(chlorinated_safe_water_quality),
+            median = median(chlorinated_safe_water_quality),
+            mean = mean(chlorinated_safe_water_quality),
+            std_dev = sd(chlorinated_safe_water_quality),
+            first_q = quantile(chlorinated_safe_water_quality, probs = 0.25),
+            third_q = quantile(chlorinated_safe_water_quality, probs = 0.75)) |> 
+  gt() |> 
+  tab_header(
+    title = "Water Quality Summary Statistics",
+    subtitle = "Percentage of water quality tests meeting Sphere standards") |> 
+  fmt_number(
+    decimals = 1
+  ) |> 
+  cols_label(
+    country = "Country",
+    min = "Mimimum Percentage of Tests",
+    max = "Maximum Percentage of Tests",
+    median = "Median (50th percentile)",
+    mean = "Average",
+    std_dev = "Standard Deviation",
+    first_q = "25th Percentile",
+    third_q = "75th Percentile")
 
 ```
 
 
+## Sanitation
+
+Sanitation is the second component of WASH. The Sphere standard for sanitation access is 2.2, which requires a maximum of 15 persons per toilet in emergencies. This standard might be influenced by the number of refugees at a refugee camp. @fig-san-pop plots persons per toilet as a function of refugee population to identify sanitation access trends between countries and refugee population. Little correlation between population and sanitation access is displayed @fig-san-pop, notably, in Uganda, Kenya and Tanzania, toilets are very frequently shared between less than 15 people in the majority of refugee camps.
+
+```{r}
+#| label: fig-san-pop
+#| fig-cap: Refugee camp population vs number of people per toilet
+#| alt-text: Scatter plot of refugee population vs persons per toilet with a maximum of 15, identified with a horizontal line
+
+
+unhcrWASH_eastAfrica_tidy |> 
+  filter(!is.na(refugee_pop),
+         refugee_pop < 1000000) |> # remove outliers
+  ggplot(mapping = aes(x = refugee_pop,
+                       y = persons_per_toilet,
+                       color = country,
+                       shape = post_emergency)) +
+  geom_point() +
+  geom_hline(yintercept = 15, 
+             type = "dash",
+             color = "grey") + 
+  labs(title = "Impact of refugee population size on sanitation access",
+       subtitile = "Evaluated against Sphere standard 3.2 for sanitation",
+       x = "Refugee Population",
+       y = "Number of People per Toilet",
+       color = "Country",
+       shape = "Emergency Type") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Dark2")
+
+```
+
+## Overview
+
+Water and sanitation services are often related, as agencies tasked with WASH provision in emergencies may support both. @fig-wash-access plots water and sanitation access, as L/person/day and persons/toilet, respectively, for ongoing and previous emergencies in east Africa. Ideally, emergencies fall in the bottom right section created by the 2 horizontal lines, signifying that refugees have adequate drinking water access and less than the maximum number of persons per toilet. @tab-wash-access presents a summary of WASH access. 
+
+```{r}
+ #| label: fig-wash-access
+ #| fig-cap: Sanitation access and metrics for refugees in east Africa
+
+# compare drinking water and sanitation access
+unhcrWASH_eastAfrica_tidy |> 
+  ggplot() +
+  geom_point(mapping = aes(y = liters_per_person_per_day,
+                       x = persons_per_toilet,
+                       color = country,
+                       shape = post_emergency)) +
+  geom_hline(yintercept = 15,
+             color = "purple") +
+  geom_vline(xintercept = 15,
+             color = "navy") +
+  scale_x_continuous(limits = c(0, 75)) + # axes chosen to get a closer look at trends between countries
+  scale_y_continuous(limits = c(0, 75)) +
+  labs(title = "Sanitation vs Water Access in East African Refugee Camps",
+       subtitile = "Evaluated against Sphere standard 3.1 for water access and 3.2 for sanitation",
+       y = "Liters per Person per Day",
+       x = "Number of People per Toilet",
+       color = "Country",
+       shape = "Emergency Type") +
+  theme_minimal() +
+  scale_color_brewer(palette = "Paired")
+
+```
+
+
+```{r}
+#| label: tab-wash-access
+#| tab-cap: Summary of average water and santiation access during emergencies for east Africa
+#| alt-text: A table that summaries number of emergenices, refugee camps and average access to WASH sevices
+
+not_needed <- c("start_date", "end_year", "duration_emergency", "persons_per_handpump", "persons_per_tap", "non_chlorinated_0_cfu", "households_with_toilet", "persons_per_shower", "persons_per_hygiene_promoter", "liters_per_person_household", "potable_water_storage_10l", "protected_water_sources", "menstrual_hygiene_satisfaction",  "household_toilet", "defecate_in_toilet", "access_to_soap", "solid_waste_disposal_access")
+
+unhcrWASH_eastAfrica_tidy |> 
+  select(-not_needed) |> 
+  group_by(country) |> 
+  filter(country != "Somalia") |> # no data for Somalia
+  mutate(location_name = factor(location_name)) |> 
+  summarize(no_emergencies = n(),
+            no_refugee_camps = n_distinct(location_name),
+            avg_L_water_per_person = mean(liters_per_person_per_day, na.rm = T),
+            avg_pct_safe_water_quality = mean(chlorinated_safe_water_quality, na.rm = T),
+            avg_people_per_toilet = mean(persons_per_toilet, na.rm = T)) |> 
+  gt() |> 
+  tab_header(
+    title = "Water and Sanitation Access in East Africa during Emergencies",
+    subtitle = "") |> 
+  fmt_number(
+    columns = starts_with("avg"), 
+    decimals = 1
+  ) |> 
+  cols_label(
+    country = "Country",
+    no_emergencies = "Number of Emergencies",
+    no_refugee_camps = "Number of Refugee Camps",
+    avg_L_water_per_person = "Average Daily Water per Person (L/person/day)",
+    avg_pct_safe_water_quality = "Average Percentage of Adequate Water Quality",
+    avg_people_per_toilet = "Average Number of People per Toilet")
+```
 
 # Conclusions
 
 ## Summary of Findings
 
+- Water access in refugee camps has not significantly improved over the last 10 years, this is more often predicted by country of refugee camp
+
+- No overt trends are able to be discerned from refugee population vs number of persons per toilet, this is an apparent challenge for Ethiopian refugee camps, but a strength for Ugandan, Kenyan and Tanzanian refugee camps during and after emergencies
+
+- On average, it is more challenging to achieve sanitation minimum standards than drinking water access
+
 ## Questions and Next Steps
+
+This is an extremely large data set, my analysis draws conclusions on current and post-emergency situations in east Africa. A next step in is to scale up to a global analysis by breaking the data into region and income level to better understand global trends in emergency WASH access.
