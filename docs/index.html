@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Whitney N Knopp">
-<meta name="dcterms.date" content="2025-07-24">
+<meta name="dcterms.date" content="2025-07-25">
 
 <title>Emergency WASH Access for Refugees</title>
 <style>
@@ -57,7 +57,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="index_files/libs/clipboard/clipboard.min.js"></script>
@@ -136,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">July 24, 2025</p>
+      <p class="date">July 25, 2025</p>
     </div>
   </div>
   
@@ -150,10 +170,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
-<p>[Brief description of your project and dataset]</p>
+<p>Humanitarian and natural emergencies often significantly reduce access to water, sanitation and hygiene (WASH) services for refugee populations and internally displaced peoples. This negatively impacts public health and personal dignity.</p>
+<p>My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation.</p>
 </section>
 <section id="methods" class="level1">
 <h1>Methods</h1>
+<p>The data set used in this analysis comes from the United Nations High Commission on Refugees (UNHCR). It documents access to WASH services in refugee camps through numerous indicators collected over 12 years. The UNHCR WASH data are available as a package in R with documentation in github <span class="citation" data-cites="yashdubey2024a">(<a href="#ref-yashdubey2024a" role="doc-biblioref">Yash Dubey, 2024</a>)</span>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unhcrwash)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -169,7 +191,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unhcrwash)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="reading-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-data">Reading the Data</h2>
@@ -227,27 +250,27 @@ dbl (21): form_id, location_id, persons_per_handpump, persons_per_tap, liter...
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>unhcrwash_raw <span class="sc">|&gt;</span> </span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(country)) <span class="sc">|&gt;</span> </span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">number_of_emergencies =</span> <span class="fu">n</span>(),</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">number_of_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">no_emergencies =</span> <span class="fu">n</span>(),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">no_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_refugee_pop =</span> <span class="fu">sum</span>(refugee_pop, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_liters_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_L_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 17%">
-<col style="width: 18%">
-<col style="width: 14%">
+<col style="width: 30%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 16%">
 <col style="width: 23%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">country</th>
-<th style="text-align: right;">number_of_emergencies</th>
-<th style="text-align: right;">number_of_refugee_camps</th>
+<th style="text-align: right;">no_emergencies</th>
+<th style="text-align: right;">no_refugee_camps</th>
 <th style="text-align: right;">total_refugee_pop</th>
-<th style="text-align: right;">avg_liters_per_person_per_day</th>
+<th style="text-align: right;">avg_L_per_person_per_day</th>
 </tr>
 </thead>
 <tbody>
@@ -503,27 +526,27 @@ dbl (21): form_id, location_id, persons_per_handpump, persons_per_tap, liter...
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>unhcrWASH_raw <span class="sc">|&gt;</span> </span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(country)) <span class="sc">|&gt;</span> </span>
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">number_of_emergencies =</span> <span class="fu">n</span>(),</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">number_of_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">no_emergencies =</span> <span class="fu">n</span>(),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">no_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_refugee_pop =</span> <span class="fu">sum</span>(refugee_pop, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_liters_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_L_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 17%">
-<col style="width: 18%">
-<col style="width: 14%">
+<col style="width: 30%">
+<col style="width: 13%">
+<col style="width: 15%">
+<col style="width: 16%">
 <col style="width: 23%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">country</th>
-<th style="text-align: right;">number_of_emergencies</th>
-<th style="text-align: right;">number_of_refugee_camps</th>
+<th style="text-align: right;">no_emergencies</th>
+<th style="text-align: right;">no_refugee_camps</th>
 <th style="text-align: right;">total_refugee_pop</th>
-<th style="text-align: right;">avg_liters_per_person_per_day</th>
+<th style="text-align: right;">avg_L_per_person_per_day</th>
 </tr>
 </thead>
 <tbody>
@@ -786,27 +809,27 @@ dbl (21): form_id, location_id, persons_per_handpump, persons_per_tap, liter...
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">%in%</span> eastAfrica, post_emergency <span class="sc">==</span> <span class="st">"Post-emergency"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(end_year <span class="sc">&lt;</span> <span class="dv">2025</span> <span class="sc">&amp;</span> end_year <span class="sc">&gt;</span> <span class="dv">2015</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">number_of_emergencies =</span> <span class="fu">n</span>(),</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">number_of_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">no_emergencies =</span> <span class="fu">n</span>(),</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">no_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">total_refugee_pop =</span> <span class="fu">sum</span>(refugee_pop, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_liters_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_L_per_person_per_day =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> </span>
 <span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <colgroup>
-<col style="width: 8%">
-<col style="width: 21%">
-<col style="width: 23%">
+<col style="width: 10%">
 <col style="width: 17%">
+<col style="width: 20%">
+<col style="width: 21%">
 <col style="width: 29%">
 </colgroup>
 <thead>
 <tr class="header">
 <th style="text-align: left;">country</th>
-<th style="text-align: right;">number_of_emergencies</th>
-<th style="text-align: right;">number_of_refugee_camps</th>
+<th style="text-align: right;">no_emergencies</th>
+<th style="text-align: right;">no_refugee_camps</th>
 <th style="text-align: right;">total_refugee_pop</th>
-<th style="text-align: right;">avg_liters_per_person_per_day</th>
+<th style="text-align: right;">avg_L_per_person_per_day</th>
 </tr>
 </thead>
 <tbody>
@@ -885,15 +908,13 @@ dbl (21): form_id, location_id, persons_per_handpump, persons_per_tap, liter...
 </section>
 <section id="results" class="level1">
 <h1>Results</h1>
-<p>[This will be the core of your analysis with specific requirements]</p>
-<p>Humanitarian and natural emergencies often significantly reduce access to water, sanitation and hygiene (WASH) services for refugee populations and internally displaced peoples. This negatively impacts public health and personal dignity.</p>
-<p>My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation.</p>
+<p>To assess WASH services in east Africa, analysis was conducted for water, sanitation and synthesized for overall results. Adequacy of services were measured in accordance with standards established in the Sphere Handbook chapter on water supply, sanitation and hygiene promotion. The Sphere Handbook include guiding standards for emergency humanitarian response <span class="citation" data-cites="TheSphereProject2018">(<a href="#ref-TheSphereProject2018" role="doc-biblioref">Project, 2018</a>)</span>.</p>
 <section id="water" class="level2">
 <h2 class="anchored" data-anchor-id="water">Water</h2>
-<p>Safe water consists of water that is available in adequate quantities, accessible on premise and free from microbial and priority chemical contaminants (site source). Water supply standard 2.1 focuses on access and availability, with a key indicator being a minimum of 15 L/person/day for drinking and domestic needs (site source). (Site figure) aims to understand if water access during emergencies in east Africa has improved over the past 10 years (2015 - 2025) as well as countries where water access/availability needs are perpetually met/not achieved.</p>
+<p>Safe water consists of water that is available in adequate quantities, accessible on premise and free from microbial and priority chemical contaminants <span class="citation" data-cites="UNGeneralAssembly1977">(<a href="#ref-UNGeneralAssembly1977" role="doc-biblioref">Assembly, 1977</a>)</span>. Water supply standard 2.1 focuses on access and availability, with a key indicator being a minimum of 15 L/person/day for drinking and domestic needs <span class="citation" data-cites="TheSphereProject2018">(<a href="#ref-TheSphereProject2018" role="doc-biblioref">Project, 2018</a>)</span>. <a href="#fig-water-quantity-results" class="quarto-xref">Figure&nbsp;1</a> aims to understand if water access during emergencies in east Africa has improved over the past 10 years (2015 - 2025) as well as countries where water access/availability needs are perpetually met/not achieved. The data does not highlight a trends of increasing access over years of emergencies. However, it is noted that between 2015 and 2025, refugee camps during emergencies in Uganda most often did not provide adequate quantities of drinking water. Conversely, refugee camps in Rwanda consistently were able to deliver adequate quantities of water for drinking and domestic uses.</p>
 <section id="water-quantity" class="level3">
 <h3 class="anchored" data-anchor-id="water-quantity">Water Quantity</h3>
-<div class="cell">
+<div class="cell" data-alt-text="Scatter plot of liters per person per day for 3 countries with during emergencies (Ethiopia, Rwanda and Uganda)">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this first portion of the analysis will focus on minimum water access for each emergency in East Africa in the last 10 years</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># I am interested in investigating if access to water has improved over time and if there are countries that typically meet needs more or less</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I also want to see if in general, taps or handpumps provide a more appropriate amount of water</span></span>
@@ -942,29 +963,29 @@ Figure&nbsp;1: Water quantity for displaced people
 </section>
 <section id="water-quality" class="level3">
 <h3 class="anchored" data-anchor-id="water-quality">Water Quality</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># i want to look at the subset of countries that have provided sufficient water and adequate water quality</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a> <span class="co"># remove lower-bound outliers; upper-bound is 100</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>qnt <span class="ot">&lt;-</span> <span class="fu">quantile</span>(unhcrWASH_tidy<span class="sc">$</span>chlorinated_safe_water_quality, <span class="at">probs=</span><span class="fu">c</span>(.<span class="dv">25</span>, .<span class="dv">75</span>), <span class="at">na.rm =</span> T)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>iqr <span class="ot">&lt;-</span> <span class="fu">IQR</span>(unhcrWASH_tidy<span class="sc">$</span>chlorinated_safe_water_quality, <span class="at">na.rm =</span> T)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">&lt;-</span> qnt[<span class="dv">1</span>] <span class="sc">-</span> <span class="fl">1.5</span><span class="sc">*</span>iqr</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(post_emergency <span class="sc">==</span> <span class="st">"Post-emergency"</span> <span class="sc">&amp;</span> </span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>           start_date <span class="sc">&gt;</span> <span class="st">"2015-01-01"</span> <span class="sc">&amp;</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&lt;</span> <span class="dv">100</span> <span class="sc">&amp;</span> </span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&gt;</span> lower) <span class="sc">|&gt;</span> </span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> country,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> chlorinated_safe_water_quality,</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country)) <span class="sc">+</span></span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="dv">2</span><span class="sc">/</span><span class="dv">4</span>) <span class="sc">+</span></span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Water quality at collection points in east African countries post-emergency"</span>,</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Tests meeting Sphere Standards for free Cl range of 0.2 to 2.0 mg/L and turbidity less than 5 NTU"</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Country"</span>,</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percent of testing meeting standards"</span>) <span class="sc">+</span></span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The other key component of safe water access is water quality. The Sphere Handbook, standard 2.1, requires tests where drinking water has turbidity below 5 NTU and a residual free chlorine level between 0.2 and 2 mg/L <span class="citation" data-cites="TheSphereProject2018">(<a href="#ref-TheSphereProject2018" role="doc-biblioref">Project, 2018</a>)</span>. <a href="#fig-water-quality" class="quarto-xref">Figure&nbsp;2</a> is a box plot of the percentage of water quality tests after an emergency that comply with Sphere standards. <a href="#tbl-water-qual" class="quarto-xref">Table&nbsp;1</a> presented the summary statistics for each country. On average, more than 90% of water quality tests for all east African countries complied with Sphere standards.</p>
+<div class="cell" data-alt-text="Box plot for east African water quality tests">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># remove lower-bound outliers; upper-bound is 100</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>qnt <span class="ot">&lt;-</span> <span class="fu">quantile</span>(unhcrWASH_tidy<span class="sc">$</span>chlorinated_safe_water_quality, <span class="at">probs=</span><span class="fu">c</span>(.<span class="dv">25</span>, .<span class="dv">75</span>), <span class="at">na.rm =</span> T)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>iqr <span class="ot">&lt;-</span> <span class="fu">IQR</span>(unhcrWASH_tidy<span class="sc">$</span>chlorinated_safe_water_quality, <span class="at">na.rm =</span> T)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>lower <span class="ot">&lt;-</span> qnt[<span class="dv">1</span>] <span class="sc">-</span> <span class="fl">1.5</span><span class="sc">*</span>iqr</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(post_emergency <span class="sc">==</span> <span class="st">"Post-emergency"</span> <span class="sc">&amp;</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>           start_date <span class="sc">&gt;</span> <span class="st">"2015-01-01"</span> <span class="sc">&amp;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&lt;</span> <span class="dv">100</span> <span class="sc">&amp;</span> </span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&gt;</span> lower) <span class="sc">|&gt;</span> </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> country,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> chlorinated_safe_water_quality,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country)) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="dv">2</span><span class="sc">/</span><span class="dv">4</span>) <span class="sc">+</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Water quality at refugee camp collection points in east African countries post-emergency"</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Tests meeting Sphere Standards"</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Country"</span>,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Percent of testing meeting standards"</span>) <span class="sc">+</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div id="fig-water-quality" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -978,146 +999,60 @@ Figure&nbsp;2: Percentage of water quality tests in refugee camps complying with
 </div>
 </div>
 </div>
-</section>
-</section>
-<section id="sanitation" class="level2">
-<h2 class="anchored" data-anchor-id="sanitation">Sanitation</h2>
-<p>are more populated refugee camps more or less likely to have access to adequate sanitation services? comparison between sanitation and drinking water</p>
-<div class="cell">
+<div class="cell" data-alt-text="A table displaying the minimum, maximum, median, mean, standard deviation, 25th and 75th percentiles for water quality tests for each country">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(refugee_pop),</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>         refugee_pop <span class="sc">&lt;</span> <span class="dv">1000000</span>) <span class="sc">|&gt;</span> <span class="co"># remove outliers</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> refugee_pop,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> persons_per_toilet,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country,</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shape =</span> post_emergency)) <span class="sc">+</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">15</span>, </span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">type =</span> <span class="st">"dash"</span>,</span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"grey"</span>) <span class="sc">+</span> </span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Impact of refugee population size on sanitation access"</span>,</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitile =</span> <span class="st">"Evaluated against Sphere standard 3.2 for sanitation"</span>,</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Refugee Population"</span>,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of People per Toilet"</span>,</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Country"</span>,</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Emergency Type"</span>) <span class="sc">+</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Dark2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in geom_hline(yintercept = 15, type = "dash", color = "grey"): Ignoring
-unknown parameters: `type`</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 29 rows containing missing values or values outside the scale range
-(`geom_point()`).</code></pre>
-</div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">subset</span>(post_emergency <span class="sc">==</span> <span class="st">"Post-emergency"</span> <span class="sc">&amp;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>           start_date <span class="sc">&gt;</span> <span class="st">"2015-01-01"</span> <span class="sc">&amp;</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&lt;</span> <span class="dv">100</span> <span class="sc">&amp;</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>           chlorinated_safe_water_quality <span class="sc">&gt;</span> lower) <span class="sc">|&gt;</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">min =</span> <span class="fu">min</span>(chlorinated_safe_water_quality),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max =</span> <span class="fu">max</span>(chlorinated_safe_water_quality),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">median =</span> <span class="fu">median</span>(chlorinated_safe_water_quality),</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(chlorinated_safe_water_quality),</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">std_dev =</span> <span class="fu">sd</span>(chlorinated_safe_water_quality),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">first_q =</span> <span class="fu">quantile</span>(chlorinated_safe_water_quality, <span class="at">probs =</span> <span class="fl">0.25</span>),</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">third_q =</span> <span class="fu">quantile</span>(chlorinated_safe_water_quality, <span class="at">probs =</span> <span class="fl">0.75</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Water Quality Summary Statistics"</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Percentage of water quality tests meeting Sphere standards"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="st">"Country"</span>,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">min =</span> <span class="st">"Mimimum Percentage of Tests"</span>,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">max =</span> <span class="st">"Maximum Percentage of Tests"</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">median =</span> <span class="st">"Median (50th percentile)"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="st">"Average"</span>,</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">std_dev =</span> <span class="st">"Standard Deviation"</span>,</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">first_q =</span> <span class="st">"25th Percentile"</span>,</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">third_q =</span> <span class="st">"75th Percentile"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-water-qual" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-alt-text="A table displaying the minimum, maximum, median, mean, standard deviation, 25th and 75th percentiles for water quality tests for each country">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-water-qual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Statistics for water quality tests meeting Sphere Standards for east African countries
+</figcaption>
+<div aria-describedby="tbl-water-qual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="overview" class="level2">
-<h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>In comparing sanitation and water access, you want to be in the bottom right section created by the 2 horizontal lines. This means refugees have adequate drinking water access and less than the maximum nuber of persons per toilet</p>
-<p>are more populated refugee camps more or less likely to have access to adequate sanitation services? comparison between sanitation and drinking water</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a> <span class="co">#| label: fig-sanitation-access</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a> <span class="co">#| fig-cap: Sanitation access and metrics for refugees in east Africa</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># compare drinking water and sanitation access</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">y =</span> liters_per_person_per_day,</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">x =</span> persons_per_toilet,</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country,</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shape =</span> post_emergency)) <span class="sc">+</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">15</span>,</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">15</span>,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"navy"</span>) <span class="sc">+</span></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">75</span>)) <span class="sc">+</span> <span class="co"># axes chosen to get a closer look at trends between countries</span></span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">75</span>)) <span class="sc">+</span></span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sanitation vs Water Access in East African Refugee Camps"</span>,</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitile =</span> <span class="st">"Evaluated against Sphere standard 3.1 for water access and 3.2 for sanitation"</span>,</span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Liters per Person per Day"</span>,</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Number of People per Toilet"</span>,</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Country"</span>,</span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Emergency Type"</span>) <span class="sc">+</span></span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Paired"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 256 rows containing missing values or values outside the scale range
-(`geom_point()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>not_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_year"</span>, <span class="st">"duration_emergency"</span>, <span class="st">"persons_per_handpump"</span>, <span class="st">"persons_per_tap"</span>, <span class="st">"non_chlorinated_0_cfu"</span>, <span class="st">"households_with_toilet"</span>, <span class="st">"persons_per_shower"</span>, <span class="st">"persons_per_hygiene_promoter"</span>, <span class="st">"liters_per_person_household"</span>, <span class="st">"potable_water_storage_10l"</span>, <span class="st">"protected_water_sources"</span>, <span class="st">"menstrual_hygiene_satisfaction"</span>,  <span class="st">"household_toilet"</span>, <span class="st">"defecate_in_toilet"</span>, <span class="st">"access_to_soap"</span>, <span class="st">"solid_waste_disposal_access"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>not_needed) <span class="sc">|&gt;</span> </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">!=</span> <span class="st">"Somalia"</span>) <span class="sc">|&gt;</span> <span class="co"># no data for Somalia</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">location_name =</span> <span class="fu">factor</span>(location_name)) <span class="sc">|&gt;</span> </span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">no_emergencies =</span> <span class="fu">n</span>(),</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">no_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_L_water_per_person =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> T),</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_pct_safe_water_quality =</span> <span class="fu">mean</span>(chlorinated_safe_water_quality, <span class="at">na.rm =</span> T),</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_people_per_toilet =</span> <span class="fu">mean</span>(persons_per_toilet, <span class="at">na.rm =</span> T)) <span class="sc">|&gt;</span> </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Water and Sanitation Access in East Africa during Emergencies"</span>,</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">""</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">starts_with</span>(<span class="st">"avg"</span>), </span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
-<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
-<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="st">"Country"</span>,</span>
-<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">no_emergencies =</span> <span class="st">"Number of Emergencies"</span>,</span>
-<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">no_refugee_camps =</span> <span class="st">"Number of Refugee Camps"</span>,</span>
-<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_L_water_per_person =</span> <span class="st">"Average Daily Water per Person (L/person/day)"</span>,</span>
-<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_pct_safe_water_quality =</span> <span class="st">"Average Percentage of Adequate Water Quality"</span>,</span>
-<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_people_per_toilet =</span> <span class="st">"Average Number of People per Toilet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %&gt;% select(not_needed)
-
-  # Now:
-  data %&gt;% select(all_of(not_needed))
-
-See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
-</div>
-<div class="cell-output-display">
-<div id="gpgxwttdjm" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#gpgxwttdjm table {
+<div id="jdfuanupnw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jdfuanupnw table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#gpgxwttdjm thead, #gpgxwttdjm tbody, #gpgxwttdjm tfoot, #gpgxwttdjm tr, #gpgxwttdjm td, #gpgxwttdjm th {
+#jdfuanupnw thead, #jdfuanupnw tbody, #jdfuanupnw tfoot, #jdfuanupnw tr, #jdfuanupnw td, #jdfuanupnw th {
   border-style: none;
 }
 
-#gpgxwttdjm p {
+#jdfuanupnw p {
   margin: 0;
   padding: 0;
 }
 
-#gpgxwttdjm .gt_table {
+#jdfuanupnw .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1143,12 +1078,12 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-left-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_caption {
+#jdfuanupnw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#gpgxwttdjm .gt_title {
+#jdfuanupnw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1160,7 +1095,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-bottom-width: 0;
 }
 
-#gpgxwttdjm .gt_subtitle {
+#jdfuanupnw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1172,7 +1107,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-top-width: 0;
 }
 
-#gpgxwttdjm .gt_heading {
+#jdfuanupnw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1184,13 +1119,13 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-right-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_bottom_border {
+#jdfuanupnw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_col_headings {
+#jdfuanupnw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1205,7 +1140,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-right-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_col_heading {
+#jdfuanupnw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1225,7 +1160,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   overflow-x: hidden;
 }
 
-#gpgxwttdjm .gt_column_spanner_outer {
+#jdfuanupnw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1237,15 +1172,15 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 4px;
 }
 
-#gpgxwttdjm .gt_column_spanner_outer:first-child {
+#jdfuanupnw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#gpgxwttdjm .gt_column_spanner_outer:last-child {
+#jdfuanupnw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#gpgxwttdjm .gt_column_spanner {
+#jdfuanupnw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1257,11 +1192,11 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   width: 100%;
 }
 
-#gpgxwttdjm .gt_spanner_row {
+#jdfuanupnw .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#gpgxwttdjm .gt_group_heading {
+#jdfuanupnw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1287,7 +1222,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   text-align: left;
 }
 
-#gpgxwttdjm .gt_empty_group_heading {
+#jdfuanupnw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1302,15 +1237,15 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   vertical-align: middle;
 }
 
-#gpgxwttdjm .gt_from_md > :first-child {
+#jdfuanupnw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#gpgxwttdjm .gt_from_md > :last-child {
+#jdfuanupnw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#gpgxwttdjm .gt_row {
+#jdfuanupnw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1329,7 +1264,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   overflow-x: hidden;
 }
 
-#gpgxwttdjm .gt_stub {
+#jdfuanupnw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1342,7 +1277,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 5px;
 }
 
-#gpgxwttdjm .gt_stub_row_group {
+#jdfuanupnw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1356,15 +1291,15 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   vertical-align: top;
 }
 
-#gpgxwttdjm .gt_row_group_first td {
+#jdfuanupnw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#gpgxwttdjm .gt_row_group_first th {
+#jdfuanupnw .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#gpgxwttdjm .gt_summary_row {
+#jdfuanupnw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1374,16 +1309,16 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 5px;
 }
 
-#gpgxwttdjm .gt_first_summary_row {
+#jdfuanupnw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_first_summary_row.thick {
+#jdfuanupnw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#gpgxwttdjm .gt_last_summary_row {
+#jdfuanupnw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1393,7 +1328,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-bottom-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_grand_summary_row {
+#jdfuanupnw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1403,7 +1338,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 5px;
 }
 
-#gpgxwttdjm .gt_first_grand_summary_row {
+#jdfuanupnw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1413,7 +1348,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-top-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_last_grand_summary_row_top {
+#jdfuanupnw .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1423,11 +1358,11 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-bottom-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_striped {
+#jdfuanupnw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#gpgxwttdjm .gt_table_body {
+#jdfuanupnw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1436,7 +1371,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-bottom-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_footnotes {
+#jdfuanupnw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1450,7 +1385,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-right-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_footnote {
+#jdfuanupnw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1459,7 +1394,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 5px;
 }
 
-#gpgxwttdjm .gt_sourcenotes {
+#jdfuanupnw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1473,7 +1408,7 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   border-right-color: #D3D3D3;
 }
 
-#gpgxwttdjm .gt_sourcenote {
+#jdfuanupnw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1481,77 +1416,741 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
   padding-right: 5px;
 }
 
-#gpgxwttdjm .gt_left {
+#jdfuanupnw .gt_left {
   text-align: left;
 }
 
-#gpgxwttdjm .gt_center {
+#jdfuanupnw .gt_center {
   text-align: center;
 }
 
-#gpgxwttdjm .gt_right {
+#jdfuanupnw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#gpgxwttdjm .gt_font_normal {
+#jdfuanupnw .gt_font_normal {
   font-weight: normal;
 }
 
-#gpgxwttdjm .gt_font_bold {
+#jdfuanupnw .gt_font_bold {
   font-weight: bold;
 }
 
-#gpgxwttdjm .gt_font_italic {
+#jdfuanupnw .gt_font_italic {
   font-style: italic;
 }
 
-#gpgxwttdjm .gt_super {
+#jdfuanupnw .gt_super {
   font-size: 65%;
 }
 
-#gpgxwttdjm .gt_footnote_marks {
+#jdfuanupnw .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#gpgxwttdjm .gt_asterisk {
+#jdfuanupnw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#gpgxwttdjm .gt_indent_1 {
+#jdfuanupnw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#gpgxwttdjm .gt_indent_2 {
+#jdfuanupnw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#gpgxwttdjm .gt_indent_3 {
+#jdfuanupnw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#gpgxwttdjm .gt_indent_4 {
+#jdfuanupnw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#gpgxwttdjm .gt_indent_5 {
+#jdfuanupnw .gt_indent_5 {
   text-indent: 25px;
 }
 
-#gpgxwttdjm .katex-display {
+#jdfuanupnw .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#gpgxwttdjm div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#jdfuanupnw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="gt_heading header">
+<th colspan="8" class="gt_heading gt_title gt_font_normal">Water Quality Summary Statistics</th>
+</tr>
+<tr class="gt_heading even">
+<th colspan="8" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border">Percentage of water quality tests meeting Sphere standards</th>
+</tr>
+<tr class="gt_col_headings header">
+<th id="country" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">Country</th>
+<th id="min" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Mimimum Percentage of Tests</th>
+<th id="max" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Maximum Percentage of Tests</th>
+<th id="median" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Median (50th percentile)</th>
+<th id="mean" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Average</th>
+<th id="std_dev" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Standard Deviation</th>
+<th id="first_q" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">25th Percentile</th>
+<th id="third_q" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">75th Percentile</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_center" headers="country">Ethiopia</td>
+<td class="gt_row gt_right" headers="min">83.0</td>
+<td class="gt_row gt_right" headers="max">99.0</td>
+<td class="gt_row gt_right" headers="median">96.0</td>
+<td class="gt_row gt_right" headers="mean">94.6</td>
+<td class="gt_row gt_right" headers="std_dev">3.9</td>
+<td class="gt_row gt_right" headers="first_q">93.0</td>
+<td class="gt_row gt_right" headers="third_q">97.5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="country">Kenya</td>
+<td class="gt_row gt_right" headers="min">83.0</td>
+<td class="gt_row gt_right" headers="max">99.0</td>
+<td class="gt_row gt_right" headers="median">97.0</td>
+<td class="gt_row gt_right" headers="mean">95.6</td>
+<td class="gt_row gt_right" headers="std_dev">4.2</td>
+<td class="gt_row gt_right" headers="first_q">94.0</td>
+<td class="gt_row gt_right" headers="third_q">99.0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="country">Rwanda</td>
+<td class="gt_row gt_right" headers="min">87.0</td>
+<td class="gt_row gt_right" headers="max">98.0</td>
+<td class="gt_row gt_right" headers="median">97.0</td>
+<td class="gt_row gt_right" headers="mean">95.2</td>
+<td class="gt_row gt_right" headers="std_dev">3.7</td>
+<td class="gt_row gt_right" headers="first_q">95.0</td>
+<td class="gt_row gt_right" headers="third_q">97.0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="country">Tanzania</td>
+<td class="gt_row gt_right" headers="min">86.0</td>
+<td class="gt_row gt_right" headers="max">99.0</td>
+<td class="gt_row gt_right" headers="median">95.0</td>
+<td class="gt_row gt_right" headers="mean">94.5</td>
+<td class="gt_row gt_right" headers="std_dev">4.3</td>
+<td class="gt_row gt_right" headers="first_q">90.0</td>
+<td class="gt_row gt_right" headers="third_q">98.0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="country">Uganda</td>
+<td class="gt_row gt_right" headers="min">83.0</td>
+<td class="gt_row gt_right" headers="max">99.0</td>
+<td class="gt_row gt_right" headers="median">92.0</td>
+<td class="gt_row gt_right" headers="mean">92.0</td>
+<td class="gt_row gt_right" headers="std_dev">4.3</td>
+<td class="gt_row gt_right" headers="first_q">88.0</td>
+<td class="gt_row gt_right" headers="third_q">96.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+</section>
+<section id="sanitation" class="level2">
+<h2 class="anchored" data-anchor-id="sanitation">Sanitation</h2>
+<p>Sanitation is the second component of WASH. The Sphere standard for sanitation access is 2.2, which requires a maximum of 15 persons per toilet in emergencies <span class="citation" data-cites="TheSphereProject2018">(<a href="#ref-TheSphereProject2018" role="doc-biblioref">Project, 2018</a>)</span>. This standard might be influenced by the number of refugees at a refugee camp. <a href="#fig-san-pop" class="quarto-xref">Figure&nbsp;3</a> plots persons per toilet as a function of refugee population to identify sanitation access trends between countries and refugee population. Little correlation between population and sanitation access is displayed <a href="#fig-san-pop" class="quarto-xref">Figure&nbsp;3</a>, notably, in Uganda, Kenya and Tanzania, toilets are very frequently shared between less than 15 people in the majority of refugee camps.</p>
+<div class="cell" data-alt-text="Scatter plot of refugee population vs persons per toilet with a maximum of 15, identified with a horizontal line">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(refugee_pop),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         refugee_pop <span class="sc">&lt;</span> <span class="dv">1000000</span>) <span class="sc">|&gt;</span> <span class="co"># remove outliers</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> refugee_pop,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> persons_per_toilet,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shape =</span> post_emergency)) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">15</span>, </span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>             <span class="at">type =</span> <span class="st">"dash"</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"grey"</span>) <span class="sc">+</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Impact of refugee population size on sanitation access"</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitile =</span> <span class="st">"Evaluated against Sphere standard 3.2 for sanitation"</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Refugee Population"</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of People per Toilet"</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Country"</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Emergency Type"</span>) <span class="sc">+</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Dark2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in geom_hline(yintercept = 15, type = "dash", color = "grey"): Ignoring
+unknown parameters: `type`</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 29 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-san-pop" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-san-pop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-san-pop-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-san-pop-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Refugee camp population vs number of people per toilet
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>Water and sanitation services are often related, as agencies tasked with WASH provision in emergencies may support both. <a href="#fig-wash-access" class="quarto-xref">Figure&nbsp;4</a> plots water and sanitation access, as L/person/day and persons/toilet, respectively, for ongoing and previous emergencies in east Africa. Ideally, emergencies fall in the bottom right section created by the 2 horizontal lines, signifying that refugees have adequate drinking water access and less than the maximum number of persons per toilet. <a href="#tbl-wash-access" class="quarto-xref">Table&nbsp;2</a> presents a summary of WASH access.</p>
+<div class="cell" data-alt-text="A scatter plot of drinking water access (L/person/day) vs people/toilet for refugee camps in east Africa">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compare drinking water and sanitation access</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> liters_per_person_per_day,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> persons_per_toilet,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                       <span class="at">color =</span> country,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shape =</span> post_emergency)) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">15</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"purple"</span>) <span class="sc">+</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">15</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"navy"</span>) <span class="sc">+</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">75</span>)) <span class="sc">+</span> <span class="co"># axes chosen to get a closer look at trends between countries</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">75</span>)) <span class="sc">+</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Sanitation vs Water Access in East African Refugee Camps"</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitile =</span> <span class="st">"Evaluated against Sphere standard 3.1 for water access and 3.2 for sanitation"</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Liters per Person per Day"</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Number of People per Toilet"</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Country"</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">shape =</span> <span class="st">"Emergency Type"</span>) <span class="sc">+</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">"Paired"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 256 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-wash-access" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-wash-access-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-wash-access-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-wash-access-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Water and sanitation access metrics for refugees in east Africa
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell" data-alt-text="A table that summaries number of emergenices, refugee camps and average access to WASH sevices">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>not_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_year"</span>, <span class="st">"duration_emergency"</span>, <span class="st">"persons_per_handpump"</span>, <span class="st">"persons_per_tap"</span>, <span class="st">"non_chlorinated_0_cfu"</span>, <span class="st">"households_with_toilet"</span>, <span class="st">"persons_per_shower"</span>, <span class="st">"persons_per_hygiene_promoter"</span>, <span class="st">"liters_per_person_household"</span>, <span class="st">"potable_water_storage_10l"</span>, <span class="st">"protected_water_sources"</span>, <span class="st">"menstrual_hygiene_satisfaction"</span>,  <span class="st">"household_toilet"</span>, <span class="st">"defecate_in_toilet"</span>, <span class="st">"access_to_soap"</span>, <span class="st">"solid_waste_disposal_access"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>unhcrWASH_eastAfrica_tidy <span class="sc">|&gt;</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>not_needed) <span class="sc">|&gt;</span> </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country <span class="sc">!=</span> <span class="st">"Somalia"</span>) <span class="sc">|&gt;</span> <span class="co"># no data for Somalia</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">location_name =</span> <span class="fu">factor</span>(location_name)) <span class="sc">|&gt;</span> </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">no_emergencies =</span> <span class="fu">n</span>(),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">no_refugee_camps =</span> <span class="fu">n_distinct</span>(location_name),</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_L_water_per_person =</span> <span class="fu">mean</span>(liters_per_person_per_day, <span class="at">na.rm =</span> T),</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_pct_safe_water_quality =</span> <span class="fu">mean</span>(chlorinated_safe_water_quality, <span class="at">na.rm =</span> T),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">avg_people_per_toilet =</span> <span class="fu">mean</span>(persons_per_toilet, <span class="at">na.rm =</span> T)) <span class="sc">|&gt;</span> </span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Water and Sanitation Access in East Africa during Emergencies"</span>,</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">""</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fmt_number</span>(</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">columns =</span> <span class="fu">starts_with</span>(<span class="st">"avg"</span>), </span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">decimals =</span> <span class="dv">1</span></span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="st">"Country"</span>,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">no_emergencies =</span> <span class="st">"Number of Emergencies"</span>,</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">no_refugee_camps =</span> <span class="st">"Number of Refugee Camps"</span>,</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_L_water_per_person =</span> <span class="st">"Average Daily Water per Person (L/person/day)"</span>,</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_pct_safe_water_quality =</span> <span class="st">"Average Percentage of Adequate Water Quality"</span>,</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_people_per_toilet =</span> <span class="st">"Average Number of People per Toilet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
+ℹ Please use `all_of()` or `any_of()` instead.
+  # Was:
+  data %&gt;% select(not_needed)
+
+  # Now:
+  data %&gt;% select(all_of(not_needed))
+
+See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</code></pre>
+</div>
+<div id="tbl-wash-access" class="cell quarto-float quarto-figure quarto-figure-center anchored" data-alt-text="A table that summaries number of emergenices, refugee camps and average access to WASH sevices">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-wash-access-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Summary of average water and santiation access during emergencies for east Africa
+</figcaption>
+<div aria-describedby="tbl-wash-access-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div id="cjxknerbru" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cjxknerbru table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#cjxknerbru thead, #cjxknerbru tbody, #cjxknerbru tfoot, #cjxknerbru tr, #cjxknerbru td, #cjxknerbru th {
+  border-style: none;
+}
+
+#cjxknerbru p {
+  margin: 0;
+  padding: 0;
+}
+
+#cjxknerbru .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#cjxknerbru .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#cjxknerbru .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#cjxknerbru .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#cjxknerbru .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#cjxknerbru .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#cjxknerbru .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#cjxknerbru .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#cjxknerbru .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#cjxknerbru .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#cjxknerbru .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cjxknerbru .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#cjxknerbru .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#cjxknerbru .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#cjxknerbru .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjxknerbru .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#cjxknerbru .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#cjxknerbru .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#cjxknerbru .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjxknerbru .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#cjxknerbru .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjxknerbru .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#cjxknerbru .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjxknerbru .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cjxknerbru .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cjxknerbru .gt_left {
+  text-align: left;
+}
+
+#cjxknerbru .gt_center {
+  text-align: center;
+}
+
+#cjxknerbru .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#cjxknerbru .gt_font_normal {
+  font-weight: normal;
+}
+
+#cjxknerbru .gt_font_bold {
+  font-weight: bold;
+}
+
+#cjxknerbru .gt_font_italic {
+  font-style: italic;
+}
+
+#cjxknerbru .gt_super {
+  font-size: 65%;
+}
+
+#cjxknerbru .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#cjxknerbru .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#cjxknerbru .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#cjxknerbru .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#cjxknerbru .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#cjxknerbru .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#cjxknerbru .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#cjxknerbru .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#cjxknerbru div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table do-not-create-environment cell caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead>
 <tr class="gt_heading header">
 <th colspan="6" class="gt_heading gt_title gt_font_normal gt_bottom_border">Water and Sanitation Access in East Africa during Emergencies</th>
@@ -1612,25 +2211,39 @@ See &lt;https://tidyselect.r-lib.org/reference/faq-external-vector.html&gt;.</co
 </div>
 </div>
 </div>
+</figure>
+</div>
+</div>
 </section>
 </section>
 <section id="conclusions" class="level1">
 <h1>Conclusions</h1>
-<ul>
-<li>Date of emergency is less indicative of water access, country is more influential</li>
-<li>for all east African countries, more than 85% of the tests met Sphere standards for water quality; highest achieving is Rwanda, and it has a vast number of refugee camps</li>
-<li>no overt trends are able to be discerned from refugee population vs number of persons per toilet, Ethiopia really struggles with this aspect</li>
-<li>more challenging to achieve sanitation minimum standards than drinking water</li>
-</ul>
 <section id="summary-of-findings" class="level2">
 <h2 class="anchored" data-anchor-id="summary-of-findings">Summary of Findings</h2>
+<ul>
+<li><p>Water access in refugee camps has not significantly improved over the last 10 years, this is more often predicted by country of refugee camp</p></li>
+<li><p>No overt trends are able to be discerned from refugee population vs number of persons per toilet, this is an apparent challenge for Ethiopian refugee camps, but a strength for Ugandan, Kenyan and Tanzanian refugee camps during and after emergencies</p></li>
+<li><p>On average, it is more challenging to achieve sanitation minimum standards than drinking water access</p></li>
+</ul>
 </section>
 <section id="questions-and-next-steps" class="level2">
 <h2 class="anchored" data-anchor-id="questions-and-next-steps">Questions and Next Steps</h2>
+<p>This is an extremely large data set, my analysis draws conclusions on current and post-emergency situations in east Africa. A next step in is to scale up to a global analysis by breaking the data into region and income level to better understand global trends in emergency WASH access.</p>
+
 </section>
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-UNGeneralAssembly1977" class="csl-entry" role="listitem">
+Assembly, U. G. (1977). United nations publication, sales no. E.97.IV.6), chap. I, resolution 1, annex II. 3 report of the united nations water conference. In <em>Treaty Series: Vol. I</em> (p. 27531). United Nations General Assembly.
+</div>
+<div id="ref-TheSphereProject2018" class="csl-entry" role="listitem">
+Project, T. S. (2018). The sphere handbook 2018. In <em>Publisher: Practical Action; Pap/Cdr edition</em>.
+</div>
+<div id="ref-yashdubey2024a" class="csl-entry" role="listitem">
+Yash Dubey. (2024). <em>Openwashdata/unhcrwash: First release</em>. Zenodo. <a href="https://doi.org/10.5281/ZENODO.14185117">https://doi.org/10.5281/ZENODO.14185117</a>
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

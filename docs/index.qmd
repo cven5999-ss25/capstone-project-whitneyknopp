@@ -15,17 +15,19 @@ toc: true
 date: today
 format: html
 editor: visual
+bibliography: references.bib
+csl: apa.csl
 ---
 
 # Introduction
 
 Humanitarian and natural emergencies often significantly reduce access to water, sanitation and hygiene (WASH) services for refugee populations and internally displaced peoples. This negatively impacts public health and personal dignity.
 
-My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation. 
+My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation.
 
 # Methods
 
-The data set used in this analysis comes from the United Nations High Commission on Refugees (UNHCR). It documents access to WASH services in refugee camps through numerous indicators collected over 12 years. The UNHCR WASH data are available as a package in R with documentation in github (SITE). 
+The data set used in this analysis comes from the United Nations High Commission on Refugees (UNHCR). It documents access to WASH services in refugee camps through numerous indicators collected over 12 years. The UNHCR WASH data are available as a package in R with documentation in github [@yashdubey2024a].
 
 ```{r load_packages}
 library(unhcrwash)
@@ -94,8 +96,6 @@ unhcrWASH_raw |>
             total_refugee_pop = sum(refugee_pop, na.rm = TRUE),
             avg_L_per_person_per_day = mean(liters_per_person_per_day, na.rm = TRUE)) |> 
   knitr::kable(digits = 1)
-
-            
 ```
 
 ## Initial Data Tidying
@@ -140,14 +140,14 @@ unhcrWASH_eastAfrica_tidy <- unhcrWASH_tidy |>
 
 # Results
 
-To assess WASH services in east Africa, analysis was conducted for water, sanitation and synthesized for overall results. Adequacy of services were measured in accordance with standards established in the Sphere Handbook chapter on water supply, sanitation and hygiene promotion. The Sphere Handbook include guiding standards for emergency humanitarian response (SOURCE).
-
+To assess WASH services in east Africa, analysis was conducted for water, sanitation and synthesized for overall results. Adequacy of services were measured in accordance with standards established in the Sphere Handbook chapter on water supply, sanitation and hygiene promotion. The Sphere Handbook include guiding standards for emergency humanitarian response [@TheSphereProject2018].
 
 ## Water
 
-Safe water consists of water that is available in adequate quantities, accessible on premise and free from microbial and priority chemical contaminants (site source). Water supply standard 2.1 focuses on access and availability, with a key indicator being a minimum of 15 L/person/day for drinking and domestic needs (site source). @fig-water-quantity-results aims to understand if water access during emergencies in east Africa has improved over the past 10 years (2015 - 2025) as well as countries where water access/availability needs are perpetually met/not achieved. The data does not highlight a trends of increasing access over years of emergencies. However, it is noted that between 2015 and 2025, refugee camps during emergencies in Uganda most often did not provide adequate quantities of drinking water. Conversely, refugee camps in Rwanda consistently were able to deliver adequate quantities of water for drinking and domestic uses. 
+Safe water consists of water that is available in adequate quantities, accessible on premise and free from microbial and priority chemical contaminants [@UNGeneralAssembly1977]. Water supply standard 2.1 focuses on access and availability, with a key indicator being a minimum of 15 L/person/day for drinking and domestic needs [@TheSphereProject2018]. @fig-water-quantity-results aims to understand if water access during emergencies in east Africa has improved over the past 10 years (2015 - 2025) as well as countries where water access/availability needs are perpetually met/not achieved. The data does not highlight a trends of increasing access over years of emergencies. However, it is noted that between 2015 and 2025, refugee camps during emergencies in Uganda most often did not provide adequate quantities of drinking water. Conversely, refugee camps in Rwanda consistently were able to deliver adequate quantities of water for drinking and domestic uses.
 
-### Water Quantity 
+### Water Quantity
+
 ```{r}
 #| label: fig-water-quantity-results
 #| fig-cap: Water quantity for displaced people 
@@ -188,10 +188,9 @@ unhcrWASH_tidy_WQuant|>
 
 ```
 
-
 ### Water Quality
 
-The other key component of safe water access is water quality. The Sphere Handbook, standard 2.1, requires tests where drinking water has turbidity below 5 NTU and a residual free chlorine level between 0.2 and 2 mg/L (SITE). @fig-water-quality is a box plot of the percentage of water quality tests after an emergency that comply with Sphere standards. @tab-water-qual presented the summary statistics for each country. On average, more than 90% of water quality tests for all east African countries complied with Sphere standards. 
+The other key component of safe water access is water quality. The Sphere Handbook, standard 2.1, requires tests where drinking water has turbidity below 5 NTU and a residual free chlorine level between 0.2 and 2 mg/L [@TheSphereProject2018]. @fig-water-quality is a box plot of the percentage of water quality tests after an emergency that comply with Sphere standards. @tbl-water-qual presented the summary statistics for each country. On average, more than 90% of water quality tests for all east African countries complied with Sphere standards.
 
 ```{r}
 #| label: fig-water-quality
@@ -223,8 +222,8 @@ unhcrWASH_eastAfrica_tidy |>
 ```
 
 ```{r}
-#| label: tab-water-qual
-#| tab-cap: Statistics for water quality tests meeting Sphere Standards for east African countries
+#| label: tbl-water-qual
+#| tbl-cap: Statistics for water quality tests meeting Sphere Standards for east African countries
 #| alt-text: A table displaying the minimum, maximum, median, mean, standard deviation, 25th and 75th percentiles for water quality tests for each country
 
 unhcrWASH_eastAfrica_tidy |> 
@@ -259,10 +258,9 @@ unhcrWASH_eastAfrica_tidy |>
 
 ```
 
-
 ## Sanitation
 
-Sanitation is the second component of WASH. The Sphere standard for sanitation access is 2.2, which requires a maximum of 15 persons per toilet in emergencies. This standard might be influenced by the number of refugees at a refugee camp. @fig-san-pop plots persons per toilet as a function of refugee population to identify sanitation access trends between countries and refugee population. Little correlation between population and sanitation access is displayed @fig-san-pop, notably, in Uganda, Kenya and Tanzania, toilets are very frequently shared between less than 15 people in the majority of refugee camps.
+Sanitation is the second component of WASH. The Sphere standard for sanitation access is 2.2, which requires a maximum of 15 persons per toilet in emergencies [@TheSphereProject2018]. This standard might be influenced by the number of refugees at a refugee camp. @fig-san-pop plots persons per toilet as a function of refugee population to identify sanitation access trends between countries and refugee population. Little correlation between population and sanitation access is displayed @fig-san-pop, notably, in Uganda, Kenya and Tanzania, toilets are very frequently shared between less than 15 people in the majority of refugee camps.
 
 ```{r}
 #| label: fig-san-pop
@@ -294,17 +292,18 @@ unhcrWASH_eastAfrica_tidy |>
 
 ## Overview
 
-Water and sanitation services are often related, as agencies tasked with WASH provision in emergencies may support both. @fig-wash-access plots water and sanitation access, as L/person/day and persons/toilet, respectively, for ongoing and previous emergencies in east Africa. Ideally, emergencies fall in the bottom right section created by the 2 horizontal lines, signifying that refugees have adequate drinking water access and less than the maximum number of persons per toilet. @tab-wash-access presents a summary of WASH access. 
+Water and sanitation services are often related, as agencies tasked with WASH provision in emergencies may support both. @fig-wash-access plots water and sanitation access, as L/person/day and persons/toilet, respectively, for ongoing and previous emergencies in east Africa. Ideally, emergencies fall in the bottom right section created by the 2 horizontal lines, signifying that refugees have adequate drinking water access and less than the maximum number of persons per toilet. @tbl-wash-access presents a summary of WASH access.
 
 ```{r}
- #| label: fig-wash-access
- #| fig-cap: Sanitation access and metrics for refugees in east Africa
+#| label: fig-wash-access
+#| fig-cap: Water and sanitation access metrics for refugees in east Africa
+#| alt-text: A scatter plot of drinking water access (L/person/day) vs people/toilet for refugee camps in east Africa
 
 # compare drinking water and sanitation access
 unhcrWASH_eastAfrica_tidy |> 
   ggplot() +
-  geom_point(mapping = aes(y = liters_per_person_per_day,
-                       x = persons_per_toilet,
+  geom_point(mapping = aes(x = liters_per_person_per_day,
+                       y = persons_per_toilet,
                        color = country,
                        shape = post_emergency)) +
   geom_hline(yintercept = 15,
@@ -315,8 +314,8 @@ unhcrWASH_eastAfrica_tidy |>
   scale_y_continuous(limits = c(0, 75)) +
   labs(title = "Sanitation vs Water Access in East African Refugee Camps",
        subtitile = "Evaluated against Sphere standard 3.1 for water access and 3.2 for sanitation",
-       y = "Liters per Person per Day",
-       x = "Number of People per Toilet",
+       x = "Liters per Person per Day",
+       y = "Number of People per Toilet",
        color = "Country",
        shape = "Emergency Type") +
   theme_minimal() +
@@ -324,10 +323,9 @@ unhcrWASH_eastAfrica_tidy |>
 
 ```
 
-
 ```{r}
-#| label: tab-wash-access
-#| tab-cap: Summary of average water and santiation access during emergencies for east Africa
+#| label: tbl-wash-access
+#| tbl-cap: Summary of average water and santiation access during emergencies for east Africa
 #| alt-text: A table that summaries number of emergenices, refugee camps and average access to WASH sevices
 
 not_needed <- c("start_date", "end_year", "duration_emergency", "persons_per_handpump", "persons_per_tap", "non_chlorinated_0_cfu", "households_with_toilet", "persons_per_shower", "persons_per_hygiene_promoter", "liters_per_person_household", "potable_water_storage_10l", "protected_water_sources", "menstrual_hygiene_satisfaction",  "household_toilet", "defecate_in_toilet", "access_to_soap", "solid_waste_disposal_access")
@@ -363,11 +361,11 @@ unhcrWASH_eastAfrica_tidy |>
 
 ## Summary of Findings
 
-- Water access in refugee camps has not significantly improved over the last 10 years, this is more often predicted by country of refugee camp
+-   Water access in refugee camps has not significantly improved over the last 10 years, this is more often predicted by country of refugee camp
 
-- No overt trends are able to be discerned from refugee population vs number of persons per toilet, this is an apparent challenge for Ethiopian refugee camps, but a strength for Ugandan, Kenyan and Tanzanian refugee camps during and after emergencies
+-   No overt trends are able to be discerned from refugee population vs number of persons per toilet, this is an apparent challenge for Ethiopian refugee camps, but a strength for Ugandan, Kenyan and Tanzanian refugee camps during and after emergencies
 
-- On average, it is more challenging to achieve sanitation minimum standards than drinking water access
+-   On average, it is more challenging to achieve sanitation minimum standards than drinking water access
 
 ## Questions and Next Steps
 
