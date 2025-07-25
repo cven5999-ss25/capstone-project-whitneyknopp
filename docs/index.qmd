@@ -17,19 +17,23 @@ format: html
 editor: visual
 bibliography: references.bib
 csl: apa.csl
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Introduction
 
 Humanitarian and natural emergencies often significantly reduce access to water, sanitation and hygiene (WASH) services for refugee populations and internally displaced peoples. This negatively impacts public health and personal dignity.
 
-My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate each emergency for meeting the minimum standards for water and sanitation.
+My PhD research contributes to reducing the impacts of chronic and severe droughts in east Africa to increase resilience of communities, infrastructure, livelihoods and protect public health. For this analysis, I am interested in further investigating WASH access for displaced peoples in the region of east Africa from all types of humanitarian emergencies. Utilizing the Sphere Handbook for humanitarian emergencies, I will evaluate trends within emergency WASH access and refugee camps in east Africa for their ability to meet minimum standards for water and sanitation.
 
 # Methods
 
 The data set used in this analysis comes from the United Nations High Commission on Refugees (UNHCR). It documents access to WASH services in refugee camps through numerous indicators collected over 12 years. The UNHCR WASH data are available as a package in R with documentation in github [@yashdubey2024a].
 
-```{r load_packages}
+```{r}
+#| label: load_packages
+
 library(unhcrwash)
 library(tidyverse)
 library(gt)
@@ -38,7 +42,8 @@ library(unhcrwash)
 
 ## Reading the Data
 
-```{r reading_data}
+```{r}
+#| label: reading-data
 
 # there are 2 ways to read in this data because it is also a package in R
 
@@ -52,7 +57,10 @@ unhcrwash_raw <- read_csv(here::here("data/raw/unhcrwash.csv"))
 
 ## Data Exploration Approach
 
-```{r data_exploration}
+Below, the data are explored through `head()` and `dim()` of the file to see the variables and entries. Additionally, some tables are quickly created to investigate the number of countries, emergencies, refugee populations and other relevant variables.
+
+```{r}
+#| label: data-exploration
 
 # investigate the data imported data
 head(unhcrWASH_raw)
@@ -116,7 +124,8 @@ Some of the issues I encountered with the raw data, which I would like to fix wi
 
 Some of this data tidying depends on the method to bring in the data. If the data is imported as an R package, the dates already exist as a date variable, but importing as a csv, they must be changed. Additionally, the dates are separated with a `-` in the data imported as an R package and with a `/` in the csv file. Because of these differences, I will use the data frame imported from the R package for simplicity.
 
-```{r data_tidying}
+```{r}
+#| label: data-tidying
 
 # tidy data based on goals listed above
 unhcrWASH_tidy <- unhcrWASH_raw |> 
